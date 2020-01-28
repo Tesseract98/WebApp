@@ -37,4 +37,5 @@ public class PageGenerator {
         }
         return stream.toString();
     }
+
 }
