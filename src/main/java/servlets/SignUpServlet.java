@@ -1,6 +1,9 @@
 package servlets;
 
-import service.AccountService;
+import dto.UserDto;
+import dto.exceptions.DtoException;
+import model.User;
+import service.DBService;
 import templater.PageGenerator;
 
 import javax.servlet.http.HttpServlet;
@@ -12,20 +15,29 @@ import java.util.Map;
 
 public class SignUpServlet extends HttpServlet {
 
+    public SignUpServlet(){
+    }
+
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         Object login = pageVariables.get("login");
         Object password = pageVariables.get("password");
         resp.setContentType("text/html;charset=utf-8");
-        if((login == null || login.toString().isEmpty()) || (password == null || password.toString().isEmpty())){
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            resp.getWriter().println("confidential information");
-        }else{
-            AccountService accountService = AccountService.getImplement();
-            accountService.setName(login.toString());
-            accountService.setPassword(password.toString());
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println(String.format("%s %s", login, password));
+        try {
+            UserDto userDto = new UserDto(login, password);
+            if (userDto.validate()) {
+                User user = new User(userDto.getName(), userDto.getPassword());
+                DBService dbService = new DBService();
+                String userInDB = dbService.addUser(user);
+                resp.getWriter().println(String.format("%s", userInDB));
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().println("confidential information");
+            }
+        }
+        catch (DtoException e) {
+            e.printStackTrace();
         }
     }
 

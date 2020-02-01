@@ -1,6 +1,9 @@
 package servlets;
 
-import service.AccountService;
+import dto.UserDto;
+import dto.exceptions.DtoException;
+import model.User;
+import service.DBService;
 import templater.PageGenerator;
 
 import javax.servlet.http.HttpServlet;
@@ -13,17 +16,24 @@ import java.util.Map;
 public class SignInServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        DBService dbService = new DBService();
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         Object login = pageVariables.get("login");
         Object password = pageVariables.get("password");
-        AccountService accountService = AccountService.getImplement();
         resp.setContentType("text/html;charset=utf-8");
-        if(password.toString().equals(accountService.getPassword()) && login.toString().equals(accountService.getName())){
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println(String.format("Authorized: %s", login));
-        }else{
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().println("Unauthorized");
+        UserDto userDto = new UserDto(login, password);
+        try {
+            if(userDto.validate()) {
+                if (dbService.searchUser(new User(userDto.getName(), userDto.getPassword()))) {
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.getWriter().println(String.format("Authorized: %s", login));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    resp.getWriter().println("Unauthorized");
+                }
+            }
+        } catch (DtoException e) {
+            e.printStackTrace();
         }
     }
 
