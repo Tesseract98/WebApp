@@ -2,7 +2,7 @@ package servlets;
 
 import dto.UserDto;
 import dto.exceptions.DtoException;
-import model.User;
+import model.UsersDataSet;
 import service.DBService;
 import templater.PageGenerator;
 
@@ -24,7 +24,7 @@ public class SignInServlet extends HttpServlet {
         UserDto userDto = new UserDto(login, password);
         try {
             if(userDto.validate()) {
-                if (dbService.searchUser(new User(userDto.getName(), userDto.getPassword()))) {
+                if (dbService.userInDB(userDto.getName(), userDto.getPassword())) {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.getWriter().println(String.format("Authorized: %s", login));
                 } else {

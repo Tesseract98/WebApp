@@ -1,14 +1,32 @@
 package model;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User {
-    private long id;
-    private String name, password;
+@Entity
+@Table(name = "users")
+public class UsersDataSet implements Serializable {
 
-    public User(String name, String password) {
-        this.name = name;
-        this.password = password;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "login", unique = true, nullable = false)
+    private String name;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @SuppressWarnings("unused")
+    public UsersDataSet() {
+    }
+
+    public UsersDataSet(String name, String password) {
+        setId(-1);
+        setName(name);
+        setPassword(password);
     }
 
     public long getId() {
@@ -44,9 +62,9 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return name.equals(user.name) &&
-                password.equals(user.password);
+        UsersDataSet usersDataSet = (UsersDataSet) o;
+        return name.equals(usersDataSet.name) &&
+                password.equals(usersDataSet.password);
     }
 
     @Override

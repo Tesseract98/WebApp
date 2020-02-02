@@ -1,8 +1,9 @@
 package servlets;
 
+import dao.exceptions.DaoException;
 import dto.UserDto;
 import dto.exceptions.DtoException;
-import model.User;
+import model.UsersDataSet;
 import service.DBService;
 import templater.PageGenerator;
 
@@ -26,10 +27,10 @@ public class SignUpServlet extends HttpServlet {
         try {
             UserDto userDto = new UserDto(login, password);
             if (userDto.validate()) {
-                User user = new User(userDto.getName(), userDto.getPassword());
+                UsersDataSet usersDataSet = new UsersDataSet(userDto.getName(), userDto.getPassword());
                 DBService dbService = new DBService();
-                String userInDB = dbService.addUser(user);
-                resp.getWriter().println(String.format("%s", userInDB));
+                UsersDataSet userInDB = dbService.addUser(usersDataSet);
+                resp.getWriter().println(String.format("%s", userInDB.toString()));
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
                 resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -38,6 +39,8 @@ public class SignUpServlet extends HttpServlet {
         }
         catch (DtoException e) {
             e.printStackTrace();
+        } catch (DaoException e) {
+            resp.getWriter().println(e.getErrorCode());
         }
     }
 

@@ -1,121 +1,94 @@
 package service;
 
 import dao.UserDao;
-import dao.exceptions.DaoErrorCode;
-import model.User;
-import org.h2.jdbcx.JdbcDataSource;
-import service.exceptions.DbException;
+import dao.exceptions.DaoException;
+import model.UsersDataSet;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBService {
-    private final Connection connection;
+
+    private static final String hibernate_show_sql = "false";
+    private static final String hibernate_hbm2ddl_auto = "validate";
+
+    private final SessionFactory sessionFactory;
     private static Properties properties;
     private static FileInputStream fis;
 
     public DBService() {
         properties = new Properties();
-        this.connection = getH2Connection();
+        Configuration configuration = getH2Connection();
+        sessionFactory = createSessionFactory(configuration);
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public static Connection getMysqlConnection(){
-        try {
-            fis = new FileInputStream("src/main/java/configuration/mysql.properties");
-            properties.load(fis);
-            DriverManager.registerDriver((Driver) Class.forName("com.mysql.cj.jdbc.Driver").newInstance());
-            StringBuilder url = new StringBuilder();
-            url.
-                    append(properties.getProperty("DB_TYPE")).        //db type
-                    append(properties.getProperty("HOST_NAME")).           //host name
-                    append(properties.getProperty("PORT")).                //port
-                    append(properties.getProperty("NAME_DB")).              //db name
-                    append(properties.getProperty("TIMEZONE"));
-            return DriverManager.getConnection(url.toString(), properties.getProperty("NAME"), properties.getProperty("PASSWORD"));
-        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("wrong property path ".concat(e.getMessage()));
-        }
-        return null;
+    public static Configuration getMysqlConnection(){
+        Configuration configuration = new Configuration();
+        configuration.addAnnotatedClass(UsersDataSet.class);
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
+        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/db_example");
+        configuration.setProperty("hibernate.connection.username", "root");
+        configuration.setProperty("hibernate.connection.password", "admin");
+        configuration.setProperty("hibernate.show_sql", hibernate_show_sql);
+        configuration.setProperty("hibernate.hbm2ddl.auto", hibernate_hbm2ddl_auto);
+        return configuration;
     }
 
-    public String addUser(User user){
-        try {
-            connection.setAutoCommit(false);
-            UserDao userDao = new UserDao(connection);
-            userDao.createTable();
-            if(userDao.inDb(user.getName())) {
-                userDao.insertUser(user);
-                connection.commit();
-                connection.setAutoCommit(true);
-                return userDao.get(user.getName());
-            }
-            return DaoErrorCode.USER_IN_DB.toString();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public UsersDataSet addUser(UsersDataSet usersDataSet) throws DaoException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        UserDao userDao = new UserDao(session);
+        userDao.insertUser(usersDataSet);
+        UsersDataSet dataSet = userDao.getUser(usersDataSet.getName());
+        transaction.commit();
+        session.close();
+        return dataSet;
     }
 
-    public boolean searchUser(User user){
-        try {
-            UserDao userDao = new UserDao(connection);
-            return userDao.getUser(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public UsersDataSet searchUser(String name){
+        Session session = sessionFactory.openSession();
+        UserDao userDao = new UserDao(session);
+        UsersDataSet dataSet = userDao.getUser(name);
+        session.close();
+        return dataSet;
     }
 
-    public void cleanup() throws DbException {
-        UserDao userDao = new UserDao(connection);
-        try{
-            userDao.dropTable();
-        } catch (SQLException exc) {
-            throw new DbException(exc);
-        }
+    public boolean userInDB(String name, String password){
+        Session session = sessionFactory.openSession();
+        UserDao userDao = new UserDao(session);
+        boolean flag = userDao.inDb(name, password);
+        session.close();
+        return flag;
     }
 
-    public static Connection getH2Connection() {
-        try {
-            fis = new FileInputStream("src/main/java/configuration/h2.properties");
-            properties.load(fis);
-            String url = properties.getProperty("URL");
-            String name = properties.getProperty("NAME");
-            String pass = properties.getProperty("PASSWORD");
-//            String url = "jdbc:h2:./h2db";
-//            String name = "admin";
-//            String pass = "admin";
-            JdbcDataSource ds = new JdbcDataSource();
-            ds.setURL(url);
-            ds.setUser(name);
-            ds.setPassword(pass);
-            return DriverManager.getConnection(url, name, pass);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            System.out.println("wrong property path ".concat(e.getMessage()));
-        }
-        return null;
+
+    public static Configuration getH2Connection() {
+        Configuration configuration = new Configuration();
+        configuration.addAnnotatedClass(UsersDataSet.class);
+
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        configuration.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
+        configuration.setProperty("hibernate.connection.url", "jdbc:h2:./h2db");
+        configuration.setProperty("hibernate.connection.username", "admin");
+        configuration.setProperty("hibernate.connection.password", "admin");
+        configuration.setProperty("hibernate.show_sql", hibernate_show_sql);
+        configuration.setProperty("hibernate.hbm2ddl.auto", hibernate_hbm2ddl_auto);
+        return configuration;
     }
 
-    public void printConnectionInfo(){
-        try {
-            System.out.println("DB Name " + connection.getMetaData().getDatabaseProductName());
-            System.out.println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
-            System.out.println("Driver: " + connection.getMetaData().getDriverName());
-            System.out.println("Autocommit: " + connection.getAutoCommit());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private static SessionFactory createSessionFactory(Configuration configuration) {
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        builder.applySettings(configuration.getProperties());
+        ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 
 }
