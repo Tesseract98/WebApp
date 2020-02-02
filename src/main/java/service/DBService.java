@@ -90,6 +90,9 @@ public class DBService {
             String url = properties.getProperty("URL");
             String name = properties.getProperty("NAME");
             String pass = properties.getProperty("PASSWORD");
+//            String url = "jdbc:h2:./h2db";
+//            String name = "admin";
+//            String pass = "admin";
             JdbcDataSource ds = new JdbcDataSource();
             ds.setURL(url);
             ds.setUser(name);
@@ -97,7 +100,8 @@ public class DBService {
             return DriverManager.getConnection(url, name, pass);
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("wrong property path ".concat(e.getMessage()));
         }
         return null;
