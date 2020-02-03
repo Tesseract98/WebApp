@@ -1,17 +1,12 @@
 package service;
 
-import dao.UserDao;
 import dao.exceptions.DaoException;
+import executor.Executor;
 import model.UsersDataSet;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-
-import java.io.FileInputStream;
-import java.util.Properties;
 
 public class DBService {
 
@@ -19,11 +14,8 @@ public class DBService {
     private static final String hibernate_hbm2ddl_auto = "validate";
 
     private final SessionFactory sessionFactory;
-    private static Properties properties;
-    private static FileInputStream fis;
 
     public DBService() {
-        properties = new Properties();
         Configuration configuration = getH2Connection();
         sessionFactory = createSessionFactory(configuration);
     }
@@ -43,32 +35,19 @@ public class DBService {
     }
 
     public UsersDataSet addUser(UsersDataSet usersDataSet) throws DaoException {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        UserDao userDao = new UserDao(session);
-        userDao.insertUser(usersDataSet);
-        UsersDataSet dataSet = userDao.getUser(usersDataSet.getName());
-        transaction.commit();
-        session.close();
-        return dataSet;
+        Executor executor = new Executor(sessionFactory.openSession());
+        return executor.execUpdate(usersDataSet);
     }
 
     public UsersDataSet searchUser(String name){
-        Session session = sessionFactory.openSession();
-        UserDao userDao = new UserDao(session);
-        UsersDataSet dataSet = userDao.getUser(name);
-        session.close();
-        return dataSet;
+        Executor executor = new Executor(sessionFactory.openSession());
+        return executor.execGet(name);
     }
 
     public boolean userInDB(String name, String password){
-        Session session = sessionFactory.openSession();
-        UserDao userDao = new UserDao(session);
-        boolean flag = userDao.inDb(name, password);
-        session.close();
-        return flag;
+        Executor executor = new Executor(sessionFactory.openSession());
+        return executor.execCheck(name, password);
     }
-
 
     public static Configuration getH2Connection() {
         Configuration configuration = new Configuration();

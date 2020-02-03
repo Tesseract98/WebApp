@@ -7,13 +7,14 @@ import java.util.Objects;
 @Entity
 @Table(name = "users")
 public class UsersDataSet implements Serializable {
+    private static final long serialVersionUID = 314159265358979323L;
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "login", unique = true, nullable = false)
+    @Column(name = "login", unique = true, updatable = false, nullable = false)
     private String name;
 
     @Column(name = "password", nullable = false)
@@ -29,6 +30,7 @@ public class UsersDataSet implements Serializable {
         setPassword(password);
     }
 
+    @SuppressWarnings("unused")
     public long getId() {
         return id;
     }
@@ -49,6 +51,7 @@ public class UsersDataSet implements Serializable {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public String getPassword() {
         return password;
     }

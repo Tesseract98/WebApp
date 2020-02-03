@@ -2,7 +2,6 @@ package servlets;
 
 import dto.UserDto;
 import dto.exceptions.DtoException;
-import model.UsersDataSet;
 import service.DBService;
 import templater.PageGenerator;
 
