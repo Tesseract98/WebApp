@@ -1,55 +1,53 @@
 package dao;
 
-import executor.Executor;
-import model.User;
+import dao.exceptions.DaoErrorCode;
+import dao.exceptions.DaoException;
+import model.UsersDataSet;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
 
-import java.sql.Connection;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserDao {
-    private Executor executor;
+    private Session session;
 
-    public UserDao(Connection connection){
-        this.executor = new Executor(connection);
+    public UserDao(Session session){
+        this.session = session;
     }
 
-    public String get(String name) throws SQLException {
-        return executor.execQuery(String.format("select * from users where name='%s'", name), result ->
-        {
-            result.next();
-            User user = new User(result.getString(2), result.getString(3));
-            user.setId(result.getLong(1));
-            return user.toString();
-        });
+    public UsersDataSet get(long id) {
+        return session.get(UsersDataSet.class, id);
     }
 
-    public boolean getUser(User user) throws SQLException {
-        return executor.execQuery(String.format("select * from users where name='%s' and password='%s'", user.getName(), user.getPassword()),
-                ResultSet::next);
+    public UsersDataSet getUser(String name) {
+        Criteria criteria = session.createCriteria(UsersDataSet.class);
+        return (UsersDataSet) criteria.add(Restrictions.eq("name", name)).uniqueResult();
     }
 
-    public void insertUser(User user) throws SQLException {
-        executor.execUpdate(String.format(
-                "insert into users (name, password) values ('%s', '%s')", user.getName(), user.getPassword()));
+    public void insertUser(UsersDataSet usersDataSet) throws DaoException {
+        try {
+            session.save(usersDataSet);
+        }
+        catch (ConstraintViolationException exc){
+            throw new DaoException(DaoErrorCode.USER_IN_DB);
+        }
     }
 
-    public void createTable() throws SQLException {
-        executor.execUpdate("create table if not exists users(id bigint auto_increment, name varchar(256), password varchar(256), primary key(id))");
-    }
-
-    public void dropTable() throws SQLException {
-        executor.execUpdate("drop table users");
-    }
-
-    public boolean inDb(String name) throws SQLException {
-        return executor.execQuery(String.format("select * from users where name='%s'", name), result ->
-        {
-            if(result.next()){
-                return false;
-            }
-            return true;
-        });
+    public boolean inDb(String name, String password) {
+        Criteria criteria = session.createCriteria(UsersDataSet.class);
+        Map<String, String> restrictions = new HashMap<>();
+        restrictions.put("name", name);
+        restrictions.put("password", password);
+        criteria.add(Restrictions.allEq(restrictions));
+        return !criteria.list().isEmpty();
     }
 
 }

@@ -1,5 +1,7 @@
 package templater;
 
+import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,7 +19,7 @@ public class PageGenerator {
     private final Configuration cfg;
 
     private PageGenerator(){
-        cfg = new Configuration();
+        cfg = new Configuration(Configuration.VERSION_2_3_27);
     }
 
     public static PageGenerator instance(){
@@ -30,7 +32,9 @@ public class PageGenerator {
     public String getPage(String fileName, Map<String, Object> data){
         Writer stream = new StringWriter();
         try{
-            Template template = cfg.getTemplate(HTML_DIR + File.separator + fileName);
+            TemplateLoader templateLoader = new FileTemplateLoader(new File(HTML_DIR + File.separator));
+            cfg.setTemplateLoader(templateLoader);
+            Template template = cfg.getTemplate(fileName);
             template.process(data, stream);
         }catch (IOException | TemplateException exc){
             exc.printStackTrace();

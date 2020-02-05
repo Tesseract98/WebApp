@@ -1,31 +1,38 @@
 package executor;
 
-import java.sql.Statement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import dao.UserDao;
+import dao.exceptions.DaoException;
+import model.UsersDataSet;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class Executor {
-    private final Connection connection;
 
-    public Executor(Connection connection) {
-        this.connection = connection;
+    private final Session session;
+    private final UserDao userDao;
+
+    public Executor(Session session) {
+        this.session = session;
+        userDao = new UserDao(session);
     }
 
-    public void execUpdate(String update) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute(update);
-        statement.close();
+    public UsersDataSet execUpdate(UsersDataSet usersDataSet) throws DaoException {
+        Transaction transaction = session.beginTransaction();
+        userDao.insertUser(usersDataSet);
+        transaction.commit();
+        return execGet(usersDataSet.getName());
     }
 
-    public <T> T execQuery(String query, ResultHandler<T> resultHandler) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute(query);
-        ResultSet resultSet = statement.getResultSet();
-        T value = resultHandler.handle(resultSet);
-        resultSet.close();
-        statement.close();
-        return value;
+    public UsersDataSet execGet(String name) {
+        UsersDataSet usersDataSet = userDao.getUser(name);
+        session.close();
+        return usersDataSet;
+    }
+
+    public boolean execCheck(String name, String password){
+        boolean flag = userDao.inDb(name, password);
+        session.close();
+        return flag;
     }
 
 }
