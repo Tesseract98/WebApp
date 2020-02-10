@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Chat</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body onload="init();">
+
+<div id="body">
+    <div id="menu">
+        <p class="welcome">
+            Welcome: <input id="username" value="somebody" type="text">
+        </p>
+        <div style="clear : both;"></div>
+    </div>
+    <div id="chatbox">
+        <textarea style="height:500px; width=50px;" name="messages" id="messages" cols="50" rows="30" readonly="readonly"></textarea>
+    </div>
+    <form action="" name="message">
+        <input type="text" id="message" name="usermsg" size="40">
+        <input type="button" name="submitmsg" value="Send message" onclick="sendMessage();">
+    </form>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+
+    var ws;
+
+    function init(){
+        ws = new WebSocket("ws://localhost:8080/chat");
+        ws.onopen = function(event){
+        }
+        ws.onmessage = function(event){
+            var $textarea = document.getElementById("messages");
+            $textarea.value = $textarea.value + event.data + "\n";
+        }
+        ws.onclose = function(event){
+        }
+    };
+
+    function sendMessage(){
+        var messageField = document.getElementById("message");
+        var userNameField = document.getElementById("username");
+        var message = userNameField.value + " : " + messageField.value + "\n";
+        ws.send(message);
+        messageField.value = "";
+    }
+</script>
+
+</body>
+</html>
