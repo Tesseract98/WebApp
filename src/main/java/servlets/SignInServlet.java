@@ -2,6 +2,8 @@ package servlets;
 
 import dto.UserDto;
 import dto.exceptions.DtoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.DBService;
 import templater.PageGenerator;
 
@@ -14,7 +16,10 @@ import java.util.Map;
 
 public class SignInServlet extends HttpServlet {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignInServlet.class);
+
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        LOGGER.debug("doPost");
         DBService dbService = new DBService();
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         Object login = pageVariables.get("login");
@@ -32,11 +37,12 @@ public class SignInServlet extends HttpServlet {
                 }
             }
         } catch (DtoException e) {
-            e.printStackTrace();
+            LOGGER.debug("doPost DtoException {}", (Object) e.getStackTrace());
         }
     }
 
     public void  doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+        LOGGER.debug("doGet");
         Map<String, Object> request = new HashMap<>();
         request.put("link", "signin");
         resp.setContentType("text/html;charset=utf-8");
@@ -45,6 +51,7 @@ public class SignInServlet extends HttpServlet {
     }
 
     private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
+        LOGGER.debug("createPageVariablesMap");
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("login", request.getParameter("login"));
         pageVariables.put("password", request.getParameter("password"));

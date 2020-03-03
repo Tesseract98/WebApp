@@ -4,6 +4,8 @@ import dao.exceptions.DaoException;
 import dto.UserDto;
 import dto.exceptions.DtoException;
 import model.UsersDataSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.DBService;
 import templater.PageGenerator;
 
@@ -16,10 +18,13 @@ import java.util.Map;
 
 public class SignUpServlet extends HttpServlet {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignUpServlet.class);
+
     public SignUpServlet(){
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        LOGGER.debug("doPost");
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         Object login = pageVariables.get("login");
         Object password = pageVariables.get("password");
@@ -38,13 +43,15 @@ public class SignUpServlet extends HttpServlet {
             }
         }
         catch (DtoException e) {
-            e.printStackTrace();
+            LOGGER.error("doPost DtoException {}", (Object) e.getStackTrace());
         } catch (DaoException e) {
             resp.getWriter().println(e.getErrorCode());
+            LOGGER.info("doPost DaoException {}", (Object) e.getStackTrace());
         }
     }
 
     public void  doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+        LOGGER.debug("doGet");
         Map<String, Object> request = new HashMap<>();
         request.put("link", "signup");
         resp.setContentType("text/html;charset=utf-8");
@@ -53,6 +60,7 @@ public class SignUpServlet extends HttpServlet {
     }
 
     private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
+        LOGGER.debug("createPageVariablesMap");
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("login", request.getParameter("login"));
         pageVariables.put("password", request.getParameter("password"));
