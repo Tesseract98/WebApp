@@ -1,8 +1,0 @@
-org.eclipse.jetty.util.log 2020.03.03 21:01:44.033 INFO  [main] o.e.j.u.log: Logging initialized @1027ms to org.eclipse.jetty.util.log.Slf4jLog
-org.eclipse.jetty.server.Server 2020.03.03 21:01:44.621 INFO  [main] o.e.j.s.Server: jetty-9.4.20.v20190813; built: 2019-08-13T21:28:18.144Z; git: 84700530e645e812b336747464d6fbbf370c9a20; jvm 1.8.0_231-b11
-org.eclipse.jetty.server.session 2020.03.03 21:01:44.737 INFO  [main] o.e.j.s.session: DefaultSessionIdManager workerName=node0
-org.eclipse.jetty.server.session 2020.03.03 21:01:44.738 INFO  [main] o.e.j.s.session: No SessionScavenger set, using defaults
-org.eclipse.jetty.server.session 2020.03.03 21:01:44.745 INFO  [main] o.e.j.s.session: node0 Scavenging every 660000ms
-org.eclipse.jetty.server.handler.ContextHandler 2020.03.03 21:01:44.868 INFO  [main] o.e.j.s.h.ContextHandler: Started o.e.j.s.ServletContextHandler@50de0926{/,null,AVAILABLE}
-org.eclipse.jetty.server.AbstractConnector 2020.03.03 21:01:45.206 INFO  [main] o.e.j.s.AbstractConnector: Started ServerConnector@6500df86{HTTP/1.1,[http/1.1]}{0.0.0.0:8080}
-org.eclipse.jetty.server.Server 2020.03.03 21:01:45.207 INFO  [main] o.e.j.s.Server: Started @2210ms

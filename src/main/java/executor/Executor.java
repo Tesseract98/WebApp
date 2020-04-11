@@ -29,7 +29,7 @@ public class Executor {
         return usersDataSet;
     }
 
-    public boolean execCheck(String name, String password){
+    public boolean execCheck(String name, String password) {
         boolean flag = userDao.inDb(name, password);
         session.close();
         return flag;

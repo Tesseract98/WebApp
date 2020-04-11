@@ -21,7 +21,7 @@ public class DBService {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public static Configuration getMysqlConnection(){
+    public static Configuration getMysqlConnection() {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(UsersDataSet.class);
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
@@ -39,12 +39,12 @@ public class DBService {
         return executor.execUpdate(usersDataSet);
     }
 
-    public UsersDataSet searchUser(String name){
+    public UsersDataSet searchUser(String name) {
         Executor executor = new Executor(sessionFactory.openSession());
         return executor.execGet(name);
     }
 
-    public boolean userInDB(String name, String password){
+    public boolean userInDB(String name, String password) {
         Executor executor = new Executor(sessionFactory.openSession());
         return executor.execCheck(name, password);
     }

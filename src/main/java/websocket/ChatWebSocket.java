@@ -19,22 +19,22 @@ public class ChatWebSocket {
     }
 
     @OnWebSocketConnect
-    public void onOpen(Session session){
+    public void onOpen(Session session) {
         chatServiceImpl.add(this);
         this.session = session;
     }
 
     @OnWebSocketMessage
-    public void onMessage(String data){
+    public void onMessage(String data) {
         chatServiceImpl.sendMessage(data);
     }
 
     @OnWebSocketClose
-    public void onClose(int statusCode, String reason){
+    public void onClose(int statusCode, String reason) {
         chatServiceImpl.remove(this);
     }
 
-    public void sendString(String data){
+    public void sendString(String data) {
         try {
             session.getRemote().sendString(data);
         } catch (IOException e) {

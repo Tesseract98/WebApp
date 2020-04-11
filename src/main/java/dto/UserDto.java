@@ -36,9 +36,9 @@ public class UserDto {
     }
 
     private byte[] hashSHA512(byte[] salt, String password) throws NoSuchAlgorithmException {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(salt);
-            return md.digest(password.getBytes(StandardCharsets.UTF_8));
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
+        md.update(salt);
+        return md.digest(password.getBytes(StandardCharsets.UTF_8));
     }
 
     private byte[] hashPBKDF2(byte[] salt, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -68,8 +68,8 @@ public class UserDto {
     }
 
     public boolean validate() throws DtoException {
-        if(name != null && !name.toString().isEmpty()){
-            if(password != null && !password.toString().isEmpty()){
+        if (name != null && !name.toString().isEmpty()) {
+            if (password != null && !password.toString().isEmpty()) {
                 setPassword(password.toString());
                 return true;
             }

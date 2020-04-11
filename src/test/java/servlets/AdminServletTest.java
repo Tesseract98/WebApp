@@ -1,9 +1,9 @@
 package servlets;
 
 
-import accountServer.AccountServer;
-import accountServer.AccountServerImpl;
 import org.junit.jupiter.api.Test;
+import server.account.AccountServer;
+import server.account.AccountServerImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

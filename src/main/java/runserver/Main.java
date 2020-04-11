@@ -1,9 +1,5 @@
 package runserver;
 
-import accountServer.AccountServer;
-import accountServer.AccountServerController;
-import accountServer.AccountServerControllerMBean;
-import accountServer.AccountServerImpl;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -12,18 +8,22 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import servlets.AdminServlet;
-import servlets.SignInServlet;
-import servlets.SignUpServlet;
-import servlets.WebSocketChatServlet;
-import javax.management.*;
+import server.account.AccountServer;
+import server.account.AccountServerController;
+import server.account.AccountServerControllerMBean;
+import server.account.AccountServerImpl;
+import servlets.*;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 
 public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String []args) throws Exception{
+    public static void main(String[] args) throws Exception {
+
         int port = 8080;
         Server server = new Server(port);
         LOGGER.info("Starting port: " + port);
@@ -33,13 +33,12 @@ public class Main {
 
         ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         server.setHandler(contextHandler);
-        SignInServlet signInServlet = new SignInServlet();
-        SignUpServlet signUpServlet = new SignUpServlet();
-        WebSocketChatServlet webSocketChatServlet = new WebSocketChatServlet();
-        contextHandler.addServlet(new ServletHolder(signUpServlet), "/signup");
-        contextHandler.addServlet(new ServletHolder(signInServlet), "/signin");
-        contextHandler.addServlet(new ServletHolder(webSocketChatServlet), "/chat");
+
+        contextHandler.addServlet(new ServletHolder(new SignUpServlet()), "/signup");
+        contextHandler.addServlet(new ServletHolder(new SignInServlet()), "/signin");
+        contextHandler.addServlet(new ServletHolder(new WebSocketChatServlet()), "/chat");
         contextHandler.addServlet(new ServletHolder(new AdminServlet(accountServer)), "/admin");
+        contextHandler.addServlet(new ServletHolder(new ResourcesServlet()), "/resources");
 
 //        addSiteTemplate(contextHandler, server);
 
@@ -48,7 +47,8 @@ public class Main {
         server.join();
     }
 
-    private static void addJMXManipulationForJConsole(AccountServer accountServer) throws Exception{
+    private static void addJMXManipulationForJConsole(AccountServer accountServer) throws Exception {
+//        Object mBean = clazz.getConstructor(obj.getClass()).newInstance(obj);
         AccountServerControllerMBean mBean = new AccountServerController(accountServer);
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("Admin:type=AccountServerController.usersLimit");
@@ -56,7 +56,7 @@ public class Main {
     }
 
     @SuppressWarnings("unused")
-    private static void addSiteTemplate(ServletContextHandler contextHandler, Server server){
+    private static void addSiteTemplate(ServletContextHandler contextHandler, Server server) {
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);
         resource_handler.setResourceBase("site");

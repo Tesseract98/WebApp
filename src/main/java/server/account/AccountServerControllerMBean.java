@@ -1,4 +1,4 @@
-package accountServer;
+package server.account;
 
 public interface AccountServerControllerMBean {
     int getUsers();

@@ -1,4 +1,4 @@
-package accountServer;
+package server.account;
 
 public class AccountServerController implements AccountServerControllerMBean {
     private final AccountServer accountServer;

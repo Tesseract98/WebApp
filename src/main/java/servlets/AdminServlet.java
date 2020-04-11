@@ -1,8 +1,8 @@
 package servlets;
 
-import accountServer.AccountServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.account.AccountServer;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

@@ -8,18 +8,13 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UserDao {
     private Session session;
 
-    public UserDao(Session session){
+    public UserDao(Session session) {
         this.session = session;
     }
 
@@ -35,8 +30,7 @@ public class UserDao {
     public void insertUser(UsersDataSet usersDataSet) throws DaoException {
         try {
             session.save(usersDataSet);
-        }
-        catch (ConstraintViolationException exc){
+        } catch (ConstraintViolationException exc) {
             throw new DaoException(DaoErrorCode.USER_IN_DB);
         }
     }

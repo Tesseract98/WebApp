@@ -18,25 +18,25 @@ public class PageGenerator {
     private static PageGenerator pageGenerator;
     private final Configuration cfg;
 
-    private PageGenerator(){
+    private PageGenerator() {
         cfg = new Configuration(Configuration.VERSION_2_3_27);
     }
 
-    public static PageGenerator instance(){
-        if(pageGenerator == null){
+    public static PageGenerator instance() {
+        if (pageGenerator == null) {
             pageGenerator = new PageGenerator();
         }
         return pageGenerator;
     }
 
-    public String getPage(String fileName, Map<String, Object> data){
+    public String getPage(String fileName, Map<String, Object> data) {
         Writer stream = new StringWriter();
-        try{
+        try {
             TemplateLoader templateLoader = new FileTemplateLoader(new File(HTML_DIR + File.separator));
             cfg.setTemplateLoader(templateLoader);
             Template template = cfg.getTemplate(fileName);
             template.process(data, stream);
-        }catch (IOException | TemplateException exc){
+        } catch (IOException | TemplateException exc) {
             exc.printStackTrace();
         }
         return stream.toString();

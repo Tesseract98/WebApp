@@ -28,9 +28,9 @@
         </triggeringPolicy>
     </appender>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
-<!--        <appender-ref ref="file_log"/>-->
+        <!--        <appender-ref ref="file_log"/>-->
     </root>
 
 </configuration>

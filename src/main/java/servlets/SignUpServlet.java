@@ -20,7 +20,7 @@ public class SignUpServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignUpServlet.class);
 
-    public SignUpServlet(){
+    public SignUpServlet() {
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -41,8 +41,7 @@ public class SignUpServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 resp.getWriter().println("confidential information");
             }
-        }
-        catch (DtoException e) {
+        } catch (DtoException e) {
             LOGGER.error("doPost DtoException {}", (Object) e.getStackTrace());
         } catch (DaoException e) {
             resp.getWriter().println(e.getErrorCode());
@@ -50,7 +49,7 @@ public class SignUpServlet extends HttpServlet {
         }
     }
 
-    public void  doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         LOGGER.debug("doGet");
         Map<String, Object> request = new HashMap<>();
         request.put("link", "signup");
@@ -59,7 +58,7 @@ public class SignUpServlet extends HttpServlet {
         resp.getWriter().println(PageGenerator.instance().getPage("user.html", request));
     }
 
-    private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
+    private static Map<String, Object> createPageVariablesMap(HttpServletRequest request) {
         LOGGER.debug("createPageVariablesMap");
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("login", request.getParameter("login"));

@@ -27,7 +27,7 @@ public class SignInServlet extends HttpServlet {
         resp.setContentType("text/html;charset=utf-8");
         UserDto userDto = new UserDto(login, password);
         try {
-            if(userDto.validate()) {
+            if (userDto.validate()) {
                 if (dbService.userInDB(userDto.getName(), userDto.getPassword())) {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.getWriter().println(String.format("Authorized: %s", login));
@@ -41,7 +41,7 @@ public class SignInServlet extends HttpServlet {
         }
     }
 
-    public void  doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         LOGGER.debug("doGet");
         Map<String, Object> request = new HashMap<>();
         request.put("link", "signin");
@@ -50,7 +50,7 @@ public class SignInServlet extends HttpServlet {
         resp.getWriter().println(PageGenerator.instance().getPage("user.html", request));
     }
 
-    private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
+    private static Map<String, Object> createPageVariablesMap(HttpServletRequest request) {
         LOGGER.debug("createPageVariablesMap");
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("login", request.getParameter("login"));

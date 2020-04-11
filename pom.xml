@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <org.eclipse.jetty.version>9.4.20.v20190813</org.eclipse.jetty.version>
+        <org.eclipse.jetty.version>9.4.8.v20171121</org.eclipse.jetty.version>
     </properties>
 
 
@@ -61,7 +61,7 @@
             <version>${org.eclipse.jetty.version}</version>
         </dependency>
 
-        <dependency> 
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>${org.eclipse.jetty.version}</version>
