@@ -12,6 +12,7 @@ import server.account.AccountServer;
 import server.account.AccountServerController;
 import server.account.AccountServerControllerMBean;
 import server.account.AccountServerImpl;
+import server.threadpooled.ThreadPooledServer;
 import servlets.*;
 
 import javax.management.MBeanServer;
@@ -23,7 +24,6 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
-
         int port = 8080;
         Server server = new Server(port);
         LOGGER.info("Starting port: " + port);
@@ -40,13 +40,18 @@ public class Main {
         contextHandler.addServlet(new ServletHolder(new AdminServlet(accountServer)), "/admin");
         contextHandler.addServlet(new ServletHolder(new ResourcesServlet()), "/resources");
 
-//        addSiteTemplate(contextHandler, server);
+        ThreadPooledServer tps = new ThreadPooledServer(5060);
+        new Thread(tps).start();
+
+        addSiteTemplate(contextHandler, server);
 
         server.start();
         java.util.logging.Logger.getGlobal().info("Server started");
+        System.out.println("Server started");
         server.join();
     }
 
+    @SuppressWarnings("unused")
     private static void addJMXManipulationForJConsole(AccountServer accountServer) throws Exception {
 //        Object mBean = clazz.getConstructor(obj.getClass()).newInstance(obj);
         AccountServerControllerMBean mBean = new AccountServerController(accountServer);
@@ -63,6 +68,17 @@ public class Main {
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{resource_handler, contextHandler});
         server.setHandler(handlers);
+    }
+
+    @SuppressWarnings("unused")
+    private static void serverPoolStop(ThreadPooledServer tps ){
+        try {
+            Thread.sleep(20 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Stopping Server");
+        tps.stop();
     }
 
 }
