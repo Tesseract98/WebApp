@@ -39,6 +39,7 @@ gradle-app.setting
 ##############################
 out/
 .idea/
+.jpb
 .idea_modules/
 *.iml
 *.ipr
